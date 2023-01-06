@@ -44,4 +44,51 @@ describe("Todo test suite", () => {
 
 
     });
+    test("Fetches all todos in the database using /todos endpoint", async () => {
+        await agent.post("/todos").send({
+          title: "Buy xbox",
+          dueDate: new Date().toISOString(),
+          completed: false,
+        });
+        await agent.post("/todos").send({
+          title: "Buy ps3",
+          dueDate: new Date().toISOString(),
+          completed: false,
+        });
+        const response = await agent.get("/todos");
+        const parsedResponse = JSON.parse(response.text);
+    
+        expect(parsedResponse.length).toBe(4);
+        expect(parsedResponse[3]["title"]).toBe("Buy ps3");
+      });
+    
+      test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
+        // FILL IN YOUR CODE HERE
+    
+        const response = await agent.post("/todos").send({
+          title: "eating",
+          dueDate: new Date().toISOString(),
+          completed: false,
+        });
+        const parsedResponse = JSON.parse(response.text);
+        const todoid = parsedResponse.id;
+    
+        const parsedResponse1=await agent.get("/todos");
+        const parsedResponse3=JSON.parse(parsedResponse1.text);
+        const length1=parsedResponse3.length;
+    
+        expect(parsedResponse3.length).toBe(5);
+    
+        const deletetodoresponse = await agent.delete(`/todos/${todoid}`).send();
+        const parsedDelResponse=JSON.parse(deletetodoresponse.text);
+    
+        expect(parsedDelResponse).toBe(true);
+    
+        const delparsedresponse=await agent.get("/todos");
+        const delparsedresponse1=JSON.parse(delparsedresponse.text);
+    
+        expect(delparsedresponse1.length).toBe(length1-1);
+        
+        
+    });
 })
