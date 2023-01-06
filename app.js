@@ -3,20 +3,29 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 app.use(bodyParser.json());
+app.set("view engine","ejs");
+const path = require('path');
 
 const { Todo } = require("./models")
 
-app.get("/todos", async (request, response) => {
-    console.log("Todo list")
-    try{
-        const todo = await Todo.findAll({order: [["id","ASC"]]});
-        return response.json(todo)
-        }
-        catch(error){
-        console.log(error);
-        return response.status(422).json(error);
-        }
+app.use(express.static(path.join(__dirname,"public")));
+
+app.get("/",async  function (request, response) {
+  const allTodos = await Todo.getTodos();
+  if(request.accepts('html')){
+    response.render('index',{
+      allTodos
+    });
+  }
+  else{
+    response.json({allTodos})
+  }
+
 });
+
+app.get("/todos", function (request, response) {
+  console.log("todo list",request.body);
+})
 app.get("/todos/:id", async function (request, response) {
     try {
       const todo = await Todo.findByPk(request.params.id);
