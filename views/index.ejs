@@ -4,42 +4,44 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="./css/styles.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>To-do manager</title>
+    <title><%=title %></title>
     <script>
-        function updateTodo(id) {
-            fetch(`/todos/${id}/markAsCompleted` , {
+        var token = document.querySelector('meta[name+"csrf-token"]').getAttribute("content");
+        function updateTodo(id){
+            const bool = document.querySelector(`#todo-checkbox-${id}`).checked
+            fetch(`/todos/${id}` , {
                 method: "put" ,
                 headers: { "Content-Type": "application/json" },
-            })
-
-                .then((res) => {
-                    if( res.ok) {
-                        window.location.reload();
-
-                    }
-                
-
-            })
-            .catch((err) => conspole.error(err));
+                body: JSON.stringify({
+                    _csrf: token,
+            completed: bool
+                })
+            }).then((res) => {
+              if( res.ok) 
+              {
+                window.location.reload();
+            }
+        }).catch((err) => conspole.error(err));
         }
         function deleteTodo(id) {
-            fetch(`/todos/${id}/markAsCompleted` , {
-                method: "put" ,
+            console.log(id);
+            fetch(`/todos/${id}` , {
+                method: "delete" ,
                 headers: { "Content-Type": "application/json" },
-            })
-
-                .then((res) => {
-                    if( res.ok) {
-                        window.location.reload();
-
-                    }
-                
-
-            })
-            .catch((err) => conspole.error(err));
+                body: JSON.stringify({
+            //completed: true,
+            "_csrf": token
+        })
+            }).then((res) => {
+                if( res.ok) 
+                {
+                    window.location.reload();
+                }
+            }).catch((err) => conspole.error(err));
         }
     </script>
     
@@ -48,21 +50,28 @@
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
             <%- include('header.ejs') %>
-            <form action="/todos" method="post">
+            <form action="/todos" method="post" onsubmit="validate">
+
                 <div class="flex gap-2 p-4">
                     <div class="flex-auto">
-                        <input type="text" name="title" placeholder="whats next?" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" required/>
+                        <input type="text" title="Enter atleast 2 characters.Remove space in the beginning" pattern="([^\s][A-z0-9À-ž\s]+)" name="title" placeholder="whats next?" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" required/>
                     </div>
 
                 <div class="flex-auto " >
-                    <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4" />
+                    <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm leading-4" required />
+                    
                 </div>
                 <div class="flex-none">
-                    <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded font-medium py-1.5">Add</button>
+                    <button type="submit"  class="bg-green-600 text-white px-5 py-2 rounded font-medium py-1.5">Add</button>
                 </div>
             </div>
-            </form>
-            <%- include('todos.ejs') %>
+           </form>
+           <div>
+            <%- include('todo.ejs', {title: "overdue" , data: overdue}) %>
+            <%- include('todo.ejs', {title: "Due Today" , data: dueToday}) %>
+            <%- include('todo.ejs', {title: "Due Later" , data: dueLater}) %>
+            <%- include('todo.ejs', {title: "Completed items" , data: completed}) %>
+           </div>
         </div>
 
     </div>
