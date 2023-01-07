@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 app.use(bodyParser.json());
+app.use(express.urlencoded({extended:false}));
 app.set("view engine","ejs");
 const path = require('path');
 
@@ -39,8 +40,11 @@ app.get("/todos/:id", async function (request, response) {
 app.post("/todos", async (request, response) => {
     console.log("Creating a todo", request.body)
     try {
-        const todo = await Todo.addTodo({ title: request.body.title, dueDate: request.body.dueDate, completed: false })
-        return response.json(todo)
+      await Todo.addTodo({
+        title:request.body.title,
+        dueDate:request.body.dueDate,
+      });
+      return response.redirect("/");
     }   catch (error) {
         console.log(error)
         return response.status(422).json(error)
