@@ -8,6 +8,40 @@
     <link href="./css/styles.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>To-do manager</title>
+    <script>
+        function updateTodo(id) {
+            fetch(`/todos/${id}/markAsCompleted` , {
+                method: "put" ,
+                headers: { "Content-Type": "application/json" },
+            })
+
+                .then((res) => {
+                    if( res.ok) {
+                        window.location.reload();
+
+                    }
+                
+
+            })
+            .catch((err) => conspole.error(err));
+        }
+        function deleteTodo(id) {
+            fetch(`/todos/${id}/markAsCompleted` , {
+                method: "put" ,
+                headers: { "Content-Type": "application/json" },
+            })
+
+                .then((res) => {
+                    if( res.ok) {
+                        window.location.reload();
+
+                    }
+                
+
+            })
+            .catch((err) => conspole.error(err));
+        }
+    </script>
     
 </head>
 <body>
